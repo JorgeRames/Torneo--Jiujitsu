@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranking Torneo Jiu-Jitsu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: #cccccc;
+        }
+
+        .division-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            background: linear-gradient(45deg, #2c3e50, #34495e);
+            border: none;
+            color: white;
+            padding: 15px 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .tab.active {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #1a1a2e;
+            box-shadow: 0 4px 20px rgba(255,215,0,0.4);
+        }
+
+        .division-content {
+            display: none;
+        }
+
+        .division-content.active {
+            display: block;
+        }
+
+        .division-title {
+            text-align: center;
+            font-size: 2em;
+            color: #ffd700;
+            margin-bottom: 25px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .ranking-table {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .rank-group {
+            border-bottom: 2px solid rgba(255,215,0,0.3);
+        }
+
+        .rank-group:last-child {
+            border-bottom: none;
+        }
+
+        .rank-header {
+            background: linear-gradient(90deg, rgba(255,215,0,0.2), rgba(255,215,0,0.1));
+            padding: 15px 20px;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #ffd700;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,215,0,0.2);
+        }
+
+        .rank-positions {
+            padding: 10px 0;
+        }
+
+        .position-row {
+            padding: 12px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .position-row:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .position-row:last-child {
+            border-bottom: none;
+        }
+
+        .position-name {
+            font-weight: bold;
+            color: #ffffff;
+            font-size: 1.1em;
+        }
+
+        .fighter-name {
+            color: #cccccc;
+            font-style: italic;
+        }
+
+        .empty-position {
+            color: #888888;
+            font-style: italic;
+        }
+
+        .update-section {
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .update-section h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+        }
+
+        .update-input {
+            width: 100%;
+            max-width: 600px;
+            height: 200px;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: white;
+            font-family: monospace;
+            font-size: 14px;
+            resize: vertical;
+        }
+
+        .update-input::placeholder {
+            color: #aaaaaa;
+        }
+
+        .update-btn {
+            margin-top: 15px;
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            font-size: 1em;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .update-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(39,174,96,0.4);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .tab {
+                padding: 12px 20px;
+                font-size: 1em;
+            }
+
+            .division-title {
+                font-size: 1.5em;
+            }
+
+            .position-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🥋 Ranking Torneo Jiu-Jitsu</h1>
+            <p>Sistema de clasificación por divisiones</p>
+        </div>
+
+        <div class="division-tabs">
+            <button class="tab active" onclick="showDivision('sibu')">División Sibú</button>
+            <button class="tab" onclick="showDivision('duklu')">División Dúklu</button>
+            <button class="tab" onclick="showDivision('ro')">División Rö</button>
+        </div>
+
+        <div id="sibu" class="division-content active">
+            <h2 class="division-title">DIVISIÓN SIBÚ</h2>
+            <div class="ranking-table" id="sibu-table"></div>
+        </div>
+
+        <div id="duklu" class="division-content">
+            <h2 class="division-title">DIVISIÓN DÚKLU</h2>
+            <div class="ranking-table" id="duklu-table"></div>
+        </div>
+
+        <div id="ro" class="division-content">
+            <h2 class="division-title">DIVISIÓN RÖ</h2>
+            <div class="ranking-table" id="ro-table"></div>
+        </div>
+
+        <div class="update-section">
+            <h3>Actualizar Rankings</h3>
+            <p style="color: #cccccc; margin-bottom: 15px;">
+                Pega aquí los datos del Google Sheets (formato: Posición,Nombre del Luchador)
+            </p>
+            <textarea class="update-input" id="update-data" placeholder="Ejemplo:
+Sibú,Juan Pérez
+Awá 1,María González
+Awá 2,Carlos López
+..."></textarea>
+            <br>
+            <button class="update-btn" onclick="updateRankings()">Actualizar Rankings</button>
+        </div>
+    </div>
+
+    <script>
+        // Estructura del ranking con datos de ejemplo
+        let rankingData = {
+            sibu: {
+                'Sibú': [''],
+                'Awá': ['', ''],
+                'Daiba': ['', '', '', ''],
+                'Tö': ['', '', '', '', '', ''],
+                'Bäkä': ['', '', '', '', '', '']
+            },
+            duklu: {
+                'Dúklu': ['', ''],
+                'Miñi': ['', '', '', ''],
+                'Tsiru': ['', '', '', '', ''],
+                'Yaku': ['', '', '', '', ''],
+                'Guaña': ['', '', '', '']
+            },
+            ro: {
+                'Rö': ['', '', ''],
+                'Bö': ['', '', '', '', ''],
+                'Namu': ['', '', '', '', ''],
+                'Kapi': ['', '', '', ''],
+                'Jonokuchi': ['', '', '']
+            }
+        };
+
+        function showDivision(division) {
+            // Ocultar todas las divisiones
+            const divisions = document.querySelectorAll('.division-content');
+            divisions.forEach(div => div.classList.remove('active'));
+
+            // Remover clase active de todos los tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Mostrar la división seleccionada
+            document.getElementById(division).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function renderRanking(division) {
+            const table = document.getElementById(${division}-table);
+            const data = rankingData[division];
+            
+            let html = '';
+            
+            for (const [rank, fighters] of Object.entries(data)) {
+                html += <div class="rank-group">;
+                html += <div class="rank-header">${rank}</div>;
+                html += <div class="rank-positions">;
+                
+                fighters.forEach((fighter, index) => {
+                    const positionNumber = fighters.length > 1 ? ` ${index + 1}` : '';
+                    const positionName = ${rank}${positionNumber};
+                    const displayName = fighter || 'Posición disponible';
+                    const className = fighter ? 'fighter-name' : 'empty-position';
+                    
+                    html += `
+                        <div class="position-row">
+                            <span class="position-name">${positionName}</span>
+                            <span class="${className}">${displayName}</span>
+                        </div>
+                    `;
+                });
+                
+                html += </div></div>;
+            }
+            
+            table.innerHTML = html;
+        }
+
+        function updateRankings() {
+            const data = document.getElementById('update-data').value.trim();
+            if (!data) {
+                alert('Por favor, ingresa los datos de ranking');
+                return;
+            }
+
+            try {
+                // Reiniciar datos
+                for (let division in rankingData) {
+                    for (let rank in rankingData[division]) {
+                        rankingData[division][rank] = rankingData[division][rank].map(() => '');
+                    }
+                }
+
+                // Procesar líneas
+                const lines = data.split('\n').filter(line => line.trim());
+                
+                lines.forEach(line => {
+                    const [position, name] = line.split(',').map(s => s.trim());
+                    if (!position || !name) return;
+
+                    // Determinar división y posición
+                    let division, rank, index = 0;
+                    
+                    if (position.startsWith('Sibú')) {
+                        division = 'sibu';
+                        rank = 'Sibú';
+                    } else if (position.startsWith('Awá')) {
+                        division = 'sibu';
+                        rank = 'Awá';
+                        index = parseInt(position.split(' ')[1]) - 1;
+                    } else if (position.startsWith('Daiba')) {
+                        division = 'sibu';
+                        rank = 'Daiba';
+                        index = parseInt(position.split(' ')[1]) - 1;
+                    } else if (position.startsWith('Tö')) {
+                        division = 'sibu';
+                        rank = 'Tö';
+                        index = parseInt(position.split(' ')[1]) - 1;
+                    } else if (position.startsWith('Bäkä')) {
+                        division = 'sibu';
+                        rank = 'Bäkä';
+                        index = parseInt(position.split(' ')[1]) - 1;
+                    } else if (position.startsWith('Dúklu')) {
+                        division = 'duklu';
+                        rank = 'Dúklu';
+                        index = parseInt(position.split(' ')[1]) - 1;
+                    } else if (position.startsWith('Miñi')) {
+                        division = 'duklu';
+                        rank = 'Miñi';
+                        index = parseInt(position.split(' ')[1]) - 1;
+                    } else if (position.startsWith('Tsiru')) {
+                        division = 'duklu';
+                        rank = 'Tsiru';
+                        index = parseInt(position.split(' ')[1]) - 1;
+                    } else if (position.startsWith('Yaku')) {
+                        division = 'duklu';
+                        rank = 'Yaku';
+                        index = parseInt(position.split(' ')[1]) - 1;
+                    } else if (position.startsWith('Guaña')) {
+                        division = 'duklu';
+                        rank = 'Guaña';
+                        index = parseInt(position.split(' ')[1]) - 1;
+                    } else if (position.startsWith('Rö')) {
+                        division = 'ro';
+                        rank = 'Rö';
+                        index = parseInt(position.split(' ')[1]) - 1;
+                    } else if (position.startsWith('Bö')) {
+                        division = 'ro';
+                        rank = 'Bö';
+                        index = parseInt(position.split(' ')[1]) - 1;
+                    } else if (position.startsWith('Namu')) {
+                        division = 'ro';
+                        rank = 'Namu';
+                        index = parseInt(position.split(' ')[1]) - 1;
+                    } else if (position.startsWith('Kapi')) {
+                        division = 'ro';
+                        rank = 'Kapi';
+                        index = parseInt(position.split(' ')[1]) - 1;
+                    } else if (position.startsWith('Jonokuchi')) {
+                        division = 'ro';
+                        rank = 'Jonokuchi';
+                        index = parseInt(position.split(' ')[1]) - 1;
+                    }
+
+                    if (division && rank && rankingData[division][rank]) {
+                        if (index < rankingData[division][rank].length) {
+                            rankingData[division][rank][index] = name;
+                        }
+                    }
+                });
+
+                // Re-renderizar todas las divisiones
+                renderRanking('sibu');
+                renderRanking('duklu');
+                renderRanking('ro');
+
+                alert('¡Rankings actualizados correctamente!');
+                document.getElementById('update-data').value = '';
+
+            } catch (error) {
+                alert('Error al procesar los datos. Verifica el formato.');
+                console.error(error);
+            }
+        }
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            renderRanking('sibu');
+            renderRanking('duklu');
+            renderRanking('ro');
+        });
+    </script>
+</body>
+</html>
