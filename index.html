@@ -237,9 +237,9 @@
         </div>
 
         <div class="division-tabs">
-            <button class="tab active" onclick="showDivision('sibu', this)">División Sibú</button>
-            <button class="tab" onclick="showDivision('duklu', this)">División Dúklu</button>
-            <button class="tab" onclick="showDivision('ro', this)">División Rö</button>
+            <button class="tab active" id="tab-sibu">División Sibú</button>
+            <button class="tab" id="tab-duklu">División Dúklu</button>
+            <button class="tab" id="tab-ro">División Rö</button>
         </div>
 
         <div id="sibu" class="division-content active">
@@ -268,12 +268,12 @@ Awá 1,María González
 Awá 2,Carlos López
 ..."></textarea>
             <br>
-            <button class="update-btn" onclick="updateRankings()">Actualizar Rankings</button>
+            <button class="update-btn" id="update-button">Actualizar Rankings</button>
         </div>
     </div>
 
     <script>
-        // Estructura del ranking con datos de ejemplo
+        // Estructura del ranking
         let rankingData = {
             sibu: {
                 'Sibú': [''],
@@ -298,7 +298,7 @@ Awá 2,Carlos López
             }
         };
 
-        function showDivision(division, button) {
+        function showDivision(division) {
             // Ocultar todas las divisiones
             const divisions = document.querySelectorAll('.division-content');
             divisions.forEach(div => div.classList.remove('active'));
@@ -309,35 +309,33 @@ Awá 2,Carlos López
 
             // Mostrar la división seleccionada
             document.getElementById(division).classList.add('active');
-            button.classList.add('active');
+            document.getElementById('tab-' + division).classList.add('active');
         }
 
         function renderRanking(division) {
-            const table = document.getElementById(${division}-table);
+            const table = document.getElementById(division + '-table');
             const data = rankingData[division];
             
             let html = '';
             
             for (const [rank, fighters] of Object.entries(data)) {
-                html += <div class="rank-group">;
-                html += <div class="rank-header">${rank}</div>;
-                html += <div class="rank-positions">;
+                html += '<div class="rank-group">';
+                html += '<div class="rank-header">' + rank + '</div>';
+                html += '<div class="rank-positions">';
                 
-                fighters.forEach((fighter, index) => {
-                    const positionNumber = fighters.length > 1 ? ` ${index + 1}` : '';
-                    const positionName = ${rank}${positionNumber};
+                fighters.forEach(function(fighter, index) {
+                    const positionNumber = fighters.length > 1 ? ' ' + (index + 1) : '';
+                    const positionName = rank + positionNumber;
                     const displayName = fighter || 'Posición disponible';
                     const className = fighter ? 'fighter-name' : 'empty-position';
                     
-                    html += `
-                        <div class="position-row">
-                            <span class="position-name">${positionName}</span>
-                            <span class="${className}">${displayName}</span>
-                        </div>
-                    `;
+                    html += '<div class="position-row">';
+                    html += '<span class="position-name">' + positionName + '</span>';
+                    html += '<span class="' + className + '">' + displayName + '</span>';
+                    html += '</div>';
                 });
                 
-                html += </div></div>;
+                html += '</div></div>';
             }
             
             table.innerHTML = html;
@@ -354,79 +352,98 @@ Awá 2,Carlos López
                 // Reiniciar datos
                 for (let division in rankingData) {
                     for (let rank in rankingData[division]) {
-                        rankingData[division][rank] = rankingData[division][rank].map(() => '');
+                        rankingData[division][rank] = rankingData[division][rank].map(function() { return ''; });
                     }
                 }
 
                 // Procesar líneas
-                const lines = data.split('\n').filter(line => line.trim());
+                const lines = data.split('\n').filter(function(line) { return line.trim(); });
                 
-                lines.forEach(line => {
-                    const [position, name] = line.split(',').map(s => s.trim());
+                lines.forEach(function(line) {
+                    const parts = line.split(',');
+                    if (parts.length < 2) return;
+                    
+                    const position = parts[0].trim();
+                    const name = parts[1].trim();
+                    
                     if (!position || !name) return;
 
                     // Determinar división y posición
                     let division, rank, index = 0;
                     
-                    if (position.startsWith('Sibú')) {
+                    if (position === 'Sibú') {
                         division = 'sibu';
                         rank = 'Sibú';
                     } else if (position.startsWith('Awá')) {
                         division = 'sibu';
                         rank = 'Awá';
-                        index = parseInt(position.split(' ')[1]) - 1;
+                        const parts = position.split(' ');
+                        if (parts.length > 1) index = parseInt(parts[1]) - 1;
                     } else if (position.startsWith('Daiba')) {
                         division = 'sibu';
                         rank = 'Daiba';
-                        index = parseInt(position.split(' ')[1]) - 1;
+                        const parts = position.split(' ');
+                        if (parts.length > 1) index = parseInt(parts[1]) - 1;
                     } else if (position.startsWith('Tö')) {
                         division = 'sibu';
                         rank = 'Tö';
-                        index = parseInt(position.split(' ')[1]) - 1;
+                        const parts = position.split(' ');
+                        if (parts.length > 1) index = parseInt(parts[1]) - 1;
                     } else if (position.startsWith('Bäkä')) {
                         division = 'sibu';
                         rank = 'Bäkä';
-                        index = parseInt(position.split(' ')[1]) - 1;
+                        const parts = position.split(' ');
+                        if (parts.length > 1) index = parseInt(parts[1]) - 1;
                     } else if (position.startsWith('Dúklu')) {
                         division = 'duklu';
                         rank = 'Dúklu';
-                        index = parseInt(position.split(' ')[1]) - 1;
+                        const parts = position.split(' ');
+                        if (parts.length > 1) index = parseInt(parts[1]) - 1;
                     } else if (position.startsWith('Miñi')) {
                         division = 'duklu';
                         rank = 'Miñi';
-                        index = parseInt(position.split(' ')[1]) - 1;
+                        const parts = position.split(' ');
+                        if (parts.length > 1) index = parseInt(parts[1]) - 1;
                     } else if (position.startsWith('Tsiru')) {
                         division = 'duklu';
                         rank = 'Tsiru';
-                        index = parseInt(position.split(' ')[1]) - 1;
+                        const parts = position.split(' ');
+                        if (parts.length > 1) index = parseInt(parts[1]) - 1;
                     } else if (position.startsWith('Yaku')) {
                         division = 'duklu';
                         rank = 'Yaku';
-                        index = parseInt(position.split(' ')[1]) - 1;
+                        const parts = position.split(' ');
+                        if (parts.length > 1) index = parseInt(parts[1]) - 1;
                     } else if (position.startsWith('Guaña')) {
                         division = 'duklu';
                         rank = 'Guaña';
-                        index = parseInt(position.split(' ')[1]) - 1;
+                        const parts = position.split(' ');
+                        if (parts.length > 1) index = parseInt(parts[1]) - 1;
                     } else if (position.startsWith('Rö')) {
                         division = 'ro';
                         rank = 'Rö';
-                        index = parseInt(position.split(' ')[1]) - 1;
+                        const parts = position.split(' ');
+                        if (parts.length > 1) index = parseInt(parts[1]) - 1;
                     } else if (position.startsWith('Bö')) {
                         division = 'ro';
                         rank = 'Bö';
-                        index = parseInt(position.split(' ')[1]) - 1;
+                        const parts = position.split(' ');
+                        if (parts.length > 1) index = parseInt(parts[1]) - 1;
                     } else if (position.startsWith('Namu')) {
                         division = 'ro';
                         rank = 'Namu';
-                        index = parseInt(position.split(' ')[1]) - 1;
+                        const parts = position.split(' ');
+                        if (parts.length > 1) index = parseInt(parts[1]) - 1;
                     } else if (position.startsWith('Kapi')) {
                         division = 'ro';
                         rank = 'Kapi';
-                        index = parseInt(position.split(' ')[1]) - 1;
+                        const parts = position.split(' ');
+                        if (parts.length > 1) index = parseInt(parts[1]) - 1;
                     } else if (position.startsWith('Jonokuchi')) {
                         division = 'ro';
                         rank = 'Jonokuchi';
-                        index = parseInt(position.split(' ')[1]) - 1;
+                        const parts = position.split(' ');
+                        if (parts.length > 1) index = parseInt(parts[1]) - 1;
                     }
 
                     if (division && rank && rankingData[division][rank]) {
@@ -450,8 +467,17 @@ Awá 2,Carlos López
             }
         }
 
-        // Inicializar la aplicación
+        // Inicializar cuando la página carga
         document.addEventListener('DOMContentLoaded', function() {
+            // Configurar event listeners para los tabs
+            document.getElementById('tab-sibu').addEventListener('click', function() { showDivision('sibu'); });
+            document.getElementById('tab-duklu').addEventListener('click', function() { showDivision('duklu'); });
+            document.getElementById('tab-ro').addEventListener('click', function() { showDivision('ro'); });
+            
+            // Configurar botón de actualizar
+            document.getElementById('update-button').addEventListener('click', updateRankings);
+            
+            // Renderizar rankings iniciales
             renderRanking('sibu');
             renderRanking('duklu');
             renderRanking('ro');
