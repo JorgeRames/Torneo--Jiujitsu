@@ -237,9 +237,9 @@
         </div>
 
         <div class="division-tabs">
-            <button class="tab active" onclick="showDivision('sibu')">División Sibú</button>
-            <button class="tab" onclick="showDivision('duklu')">División Dúklu</button>
-            <button class="tab" onclick="showDivision('ro')">División Rö</button>
+            <button class="tab active" onclick="showDivision('sibu', this)">División Sibú</button>
+            <button class="tab" onclick="showDivision('duklu', this)">División Dúklu</button>
+            <button class="tab" onclick="showDivision('ro', this)">División Rö</button>
         </div>
 
         <div id="sibu" class="division-content active">
@@ -298,7 +298,7 @@ Awá 2,Carlos López
             }
         };
 
-        function showDivision(division) {
+        function showDivision(division, button) {
             // Ocultar todas las divisiones
             const divisions = document.querySelectorAll('.division-content');
             divisions.forEach(div => div.classList.remove('active'));
@@ -309,7 +309,7 @@ Awá 2,Carlos López
 
             // Mostrar la división seleccionada
             document.getElementById(division).classList.add('active');
-            event.target.classList.add('active');
+            button.classList.add('active');
         }
 
         function renderRanking(division) {
